@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server'
-import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 
 const validSortFields = ['title', 'publishedYear', 'createdAt'] as const
@@ -38,11 +37,11 @@ export async function GET(request: Request) {
       ? (orderParam as SortOrder)
       : 'desc'
 
-    const where: Prisma.BookWhereInput = {
+    const where = {
       ...(search && {
         title: {
           contains: search,
-          mode: 'insensitive',
+          mode: 'insensitive' as const,
         },
       }),
       ...(genre && { genre }),
@@ -50,7 +49,7 @@ export async function GET(request: Request) {
         author: {
           name: {
             contains: authorName,
-            mode: 'insensitive',
+            mode: 'insensitive' as const,
           },
         },
       }),

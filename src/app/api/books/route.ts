@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { Prisma } from '@prisma/client'
+import { hasPrismaErrorCode } from '@/lib/prisma-error'
 import { prisma } from '@/lib/prisma'
 
 // GET - Obtener todos los libros
@@ -69,20 +69,14 @@ export async function POST(request: Request) {
 
     return NextResponse.json(book, { status: 201 })
   } catch (error) {
-    if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === 'P2002'
-    ) {
+    if (hasPrismaErrorCode(error, 'P2002')) {
       return NextResponse.json(
         { error: 'El ISBN ya está registrado' },
         { status: 409 }
       )
     }
 
-    if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === 'P2003'
-    ) {
+    if (hasPrismaErrorCode(error, 'P2003')) {
       return NextResponse.json(
         { error: 'El autor indicado no existe' },
         { status: 400 }

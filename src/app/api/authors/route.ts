@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { Prisma } from '@prisma/client'
+import { hasPrismaErrorCode } from '@/lib/prisma-error'
 import { prisma } from '@/lib/prisma'
 
 // GET - Obtener todos los autores
@@ -67,10 +67,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json(author, { status: 201 })
   } catch (error) {
-    if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === 'P2002'
-    ) {
+    if (hasPrismaErrorCode(error, 'P2002')) {
       return NextResponse.json(
         { error: 'El email ya está registrado' },
         { status: 409 }

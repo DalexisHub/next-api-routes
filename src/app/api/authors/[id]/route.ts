@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { Prisma } from '@prisma/client'
+import { hasPrismaErrorCode } from '@/lib/prisma-error'
 import { prisma } from '@/lib/prisma'
 
 type RouteContext = {
@@ -93,20 +93,14 @@ export async function PUT(
 
     return NextResponse.json(author)
   } catch (error) {
-    if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === 'P2025'
-    ) {
+    if (hasPrismaErrorCode(error, 'P2025')) {
       return NextResponse.json(
         { error: 'Autor no encontrado' },
         { status: 404 }
       )
     }
 
-    if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === 'P2002'
-    ) {
+    if (hasPrismaErrorCode(error, 'P2002')) {
       return NextResponse.json(
         { error: 'El email ya está registrado' },
         { status: 409 }
@@ -140,10 +134,7 @@ export async function DELETE(
       message: 'Autor eliminado correctamente',
     })
   } catch (error) {
-    if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === 'P2025'
-    ) {
+    if (hasPrismaErrorCode(error, 'P2025')) {
       return NextResponse.json(
         { error: 'Autor no encontrado' },
         { status: 404 }
