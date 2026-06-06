@@ -7,6 +7,13 @@ type RouteContext = {
   }>
 }
 
+type AuthorBook = {
+  title: string
+  publishedYear: number | null
+  pages: number | null
+  genre: string | null
+}
+
 function bookYear(book: { title: string; publishedYear: number | null }) {
   return {
     title: book.title,
@@ -45,10 +52,11 @@ export async function GET(
       )
     }
 
-    const booksWithYear = author.books.filter(
+    const books: AuthorBook[] = author.books
+    const booksWithYear = books.filter(
       (book) => book.publishedYear !== null
     )
-    const booksWithPages = author.books.filter((book) => book.pages !== null)
+    const booksWithPages = books.filter((book) => book.pages !== null)
     const sortedByYear = [...booksWithYear].sort(
       (a, b) => Number(a.publishedYear) - Number(b.publishedYear)
     )
@@ -60,13 +68,13 @@ export async function GET(
       0
     )
     const genres = Array.from(
-      new Set(author.books.map((book) => book.genre).filter(Boolean))
+      new Set(books.map((book) => book.genre).filter(Boolean))
     )
 
     return NextResponse.json({
       authorId: author.id,
       authorName: author.name,
-      totalBooks: author.books.length,
+      totalBooks: books.length,
       firstBook: sortedByYear[0] ? bookYear(sortedByYear[0]) : null,
       latestBook: sortedByYear.at(-1) ? bookYear(sortedByYear.at(-1)!) : null,
       averagePages: booksWithPages.length
